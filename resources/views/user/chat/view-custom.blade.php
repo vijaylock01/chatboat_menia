@@ -858,7 +858,7 @@
 		appendMessage(bot_avatar, "left", "", code);
         let $msg_txt = $("#" + code);
 		let $div = $("#chat-bubble-" + code);
-		fetch('/user/chat/process/custom', {
+		fetch('/chatboat_menia/user/chat/process/custom', {
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},

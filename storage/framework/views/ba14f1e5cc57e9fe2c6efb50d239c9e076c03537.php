@@ -706,7 +706,7 @@ unset($__errorArgs, $__bag); ?>
 		formData.append('chat_code', chat_code);
 		formData.append('conversation_id', active_id);
 		formData.append('image', uploaded_image);
-		formData.append('google_search', google);
+		formData.append('google_search', google); 
 		formData.append('model', model);
 		formData.append('company', company);
 		formData.append('service', service);
@@ -714,7 +714,7 @@ unset($__errorArgs, $__bag); ?>
 		appendMessage(bot_avatar, "left", "", code);
         let $msg_txt = $("#" + code);
 		let $div = $("#chat-bubble-" + code);
-		fetch('/chatboat_menia/public/user/chat/process', {
+		fetch('/chatboat_menia/user/chat/process', {
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},
