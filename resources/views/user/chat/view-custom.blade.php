@@ -519,7 +519,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/chat/conversation',
+				url: '/chatboat_menia/public/user/chat/conversation',
 				data: { 'custom': true, 'chat_code': chat_code},
 				success: function (data) {
 
@@ -613,7 +613,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/conversation',
+			url: '/chatboat_menia/public/user/chat/conversation',
 			data: { 'custom': true, 'chat_code': chat_code},
 			success: function (data) {
 
@@ -768,7 +768,7 @@
 								$.ajax({
 									headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 									method: 'POST',
-									url: '/user/chat/conversation',
+									url: '/chatboat_menia/public/user/chat/conversation',
 									data: { 'custom': true, 'chat_code': chat_code},
 									success: function (data) {
 

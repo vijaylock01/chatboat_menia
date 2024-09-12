@@ -363,7 +363,7 @@ unset($__errorArgs, $__bag); ?>
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/chat/conversation',
+				url: '/chatboat_menia/public/user/chat/conversation',
 				data: { 'conversation_id': id, 'chat_code': chat_code},
 				success: function (data) {
 
@@ -466,7 +466,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/conversation',
+			url: '/chatboat_menia/public/user/chat/conversation',
 			data: { 'conversation_id': id, 'chat_code': chat_code},
 			success: function (data) {
 
@@ -623,7 +623,7 @@ unset($__errorArgs, $__bag); ?>
 								$.ajax({
 									headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 									method: 'POST',
-									url: '/user/chat/conversation',
+									url: '/chatboat_menia/public/user/chat/conversation',
 									data: { 'conversation_id': id, 'chat_code': chat_code},
 									success: function (data) {
 
@@ -714,7 +714,7 @@ unset($__errorArgs, $__bag); ?>
 		appendMessage(bot_avatar, "left", "", code);
         let $msg_txt = $("#" + code);
 		let $div = $("#chat-bubble-" + code);
-		fetch('/user/chat/process', {
+		fetch('/chatboat_menia/public/user/chat/process', {
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},
