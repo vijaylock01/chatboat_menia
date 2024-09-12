@@ -16,7 +16,7 @@
 
 @section('content')	
 	<div class="row justify-content-center">
-		@if ($type == 'Regular License' && $status)
+		@if ($type == 'Regular Licensssdsds')
 			<div class="row text-center justify-content-center">
 				<p class="fs-14" style="background:#FFE2E5; color:#ff0000; padding:1rem 2rem; border-radius: 0.5rem; max-width: 1200px;">{{ __('Extended License is required in order to have access to these features') }}</p>
 			</div>	
