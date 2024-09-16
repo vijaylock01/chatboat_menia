@@ -162,7 +162,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             type: "POST",
-            url: '/user/profile/theme',
+            url: '<?php echo env('BASE_URL_PUBLIC');?>user/profile/theme',
             data: {'theme': theme},
             success: function(data) {
             },

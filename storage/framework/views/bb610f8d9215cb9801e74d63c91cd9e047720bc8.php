@@ -3753,7 +3753,7 @@ unset($__errorArgs, $__bag); ?>
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/smart-editor/generate',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/smart-editor/generate',
 				data: form,
 				beforeSend: function() {
 					$('#generate').prop('disabled', true);
@@ -3851,7 +3851,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/smart-editor/favorite',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/smart-editor/favorite',
 			data: formData,
 			processData: false,
 			contentType: false,
@@ -3899,7 +3899,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/smart-editor/save',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/smart-editor/save',
 			data: { 'id': active_content, 'text': textarea, 'workbook': workbook, 'language': language.value},
 			success: function (data) {					
 				if (data['status'] == 'new') {
@@ -3972,7 +3972,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/smart-editor/show',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/smart-editor/show',
 			data: { 'code': code, 'type': type},
 			beforeSend: function() {				
 				$('.main-templates-title').addClass('hidden');
@@ -4038,7 +4038,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/smart-editor/show',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/smart-editor/show',
 			data: { 'code': code, 'type': type},
 			beforeSend: function() {				
 				$('#single-template-inputs').html(''); 
@@ -4088,7 +4088,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/file/credits',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/credits',
 			data: 'credit',
 			processData: false,
 			contentType: false,
@@ -4196,7 +4196,7 @@ unset($__errorArgs, $__bag); ?>
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/model',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/model',
 			data: { 'model': model},
 			success: function (data) {					
 				let balance = document.getElementById('balance-number');

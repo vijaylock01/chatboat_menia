@@ -136,7 +136,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/admin/chats/chat/prompt/activate',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>admin/chats/chat/prompt/activate',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -167,7 +167,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/admin/chats/chat/prompt/deactivate',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>admin/chats/chat/prompt/deactivate',
 					data: formData,
 					processData: false,
 					contentType: false,

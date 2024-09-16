@@ -132,7 +132,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/admin/chat/assistant/file/delete',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>admin/chat/assistant/file/delete',
 							data: formData,
 							processData: false,
 							contentType: false,

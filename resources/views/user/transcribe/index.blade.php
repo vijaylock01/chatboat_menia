@@ -544,7 +544,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/speech-to-text/save',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/speech-to-text/save',
 				data: { 'id': event.target, 'text': textarea, 'title': title},
 				success: function (data) {					
 					if (data['status'] == 'success') {

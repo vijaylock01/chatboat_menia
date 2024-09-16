@@ -519,7 +519,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/chatboat_menia/public/user/chat/conversation',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>chatboat_menia/public/user/chat/conversation',
 				data: { 'custom': true, 'chat_code': chat_code},
 				success: function (data) {
 
@@ -613,7 +613,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/chatboat_menia/public/user/chat/conversation',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>chatboat_menia/public/user/chat/conversation',
 			data: { 'custom': true, 'chat_code': chat_code},
 			success: function (data) {
 
@@ -661,7 +661,7 @@
 		$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/chat/history',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/history',
 				data: { 'conversation_id': active_id,},
 				success: function (data) {
 
@@ -707,7 +707,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/chat/rename',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/rename',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -749,7 +749,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/chat/delete',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/delete',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -768,7 +768,7 @@
 								$.ajax({
 									headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 									method: 'POST',
-									url: '/chatboat_menia/public/user/chat/conversation',
+									url: '<?php echo env('BASE_URL_PUBLIC');?>chatboat_menia/public/user/chat/conversation',
 									data: { 'custom': true, 'chat_code': chat_code},
 									success: function (data) {
 
@@ -858,7 +858,7 @@
 		appendMessage(bot_avatar, "left", "", code);
         let $msg_txt = $("#" + code);
 		let $div = $("#chat-bubble-" + code);
-		fetch('/chatboat_menia/user/chat/process/custom', {
+		fetch('<?php echo env('BASE_URL_PUBLIC');?>user/chat/process/custom', {
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},
@@ -879,7 +879,7 @@
 			})	
 			.then(data => {
 				
-				eventSource = new EventSource("/user/chat/generate/custom?conversation_id=" + active_id);				
+				eventSource = new EventSource("<?php echo env('BASE_URL_PUBLIC');?>user/chat/generate/custom?conversation_id=" + active_id);				
 				const response = document.getElementById(code);
 				const chatbubble = document.getElementById('chat-bubble-' + code);
 				let msg = '';
@@ -1340,7 +1340,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/listen',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/listen',
 			data: formData,
 			processData: false,
 			contentType: false,
@@ -1382,7 +1382,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/templates/brand',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/templates/brand',
 				data: { 'brand': input.value},
 				success: function (data) {					
 					if (data['status'] == 'success') {
@@ -1463,7 +1463,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/model',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/model',
 			data: { 'model': radio.value},
 			success: function (data) {					
 				let balance = document.getElementById('balance-number');

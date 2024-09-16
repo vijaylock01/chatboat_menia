@@ -196,7 +196,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/chat/image/conversation',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/conversation',
 				data: { 'conversation_id': id, 'chat_code': chat_code},
 				success: function (data) {
 
@@ -243,7 +243,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/image/conversation',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/conversation',
 			data: { 'conversation_id': id, 'chat_code': chat_code},
 			success: function (data) {
 
@@ -291,7 +291,7 @@
 		$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/chat/image/history',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/history',
 				data: { 'conversation_id': active_id,},
 				success: function (data) {
 
@@ -338,7 +338,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/chat/image/rename',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/rename',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -380,7 +380,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/chat/image/delete',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/delete',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -400,7 +400,7 @@
 								$.ajax({
 									headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 									method: 'POST',
-									url: '/user/chat/image/conversation',
+									url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/conversation',
 									data: { 'conversation_id': id, 'chat_code': chat_code},
 									success: function (data) {
 
@@ -478,7 +478,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/image/process',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/image/process',
 			data: formData,
 			contentType: false,
 			processData: false,

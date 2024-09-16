@@ -129,7 +129,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/admin/image/prompt/activate',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>admin/image/prompt/activate',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -160,7 +160,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/admin/image/prompt/deactivate',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>admin/image/prompt/deactivate',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -199,7 +199,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/admin/image/prompt/delete',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>admin/image/prompt/delete',
 							data: formData,
 							processData: false,
 							contentType: false,

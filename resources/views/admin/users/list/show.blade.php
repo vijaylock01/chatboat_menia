@@ -457,7 +457,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'post',
-				url: '/admin/users/plan',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>admin/users/plan',
 				data: formData,
 				processData: false,
 				contentType: false,

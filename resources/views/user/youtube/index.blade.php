@@ -3894,7 +3894,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/youtube/generate',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/youtube/generate',
 				data: form.serialize(),
 				beforeSend: function() {					
 					$('#generate').prop('disabled', true);
@@ -4010,7 +4010,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/rss/save',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/rss/save',
 				data: { 'id': event.target, 'text': textarea, 'workbook': workbook, 'language': language.value, 'title': title},
 				success: function (data) {					
 					if (data['status'] == 'success') {
@@ -4039,7 +4039,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/file/credits',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/credits',
 			data: 'credit',
 			processData: false,
 			contentType: false,
@@ -4143,7 +4143,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/rewriter/brand',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/rewriter/brand',
 				data: { 'brand': input.value},
 				success: function (data) {					
 					if (data['status'] == 'success') {
@@ -4178,7 +4178,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/model',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/model',
 			data: { 'model': model},
 			success: function (data) {					
 				let balance = document.getElementById('balance-number');

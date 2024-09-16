@@ -1660,7 +1660,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/images/process',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/images/process',
 				data: form,
 				contentType: false,
 				processData: false,

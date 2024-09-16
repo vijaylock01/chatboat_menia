@@ -523,7 +523,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/user/text-to-speech/clone/delete',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>user/text-to-speech/clone/delete',
 							data: formData,
 							processData: false,
 							contentType: false,
@@ -819,7 +819,7 @@
 							'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 						},
 						type: "POST",
-						url: '/user/text-to-speech/clone/voice/remove',
+						url: '<?php echo env('BASE_URL_PUBLIC');?>user/text-to-speech/clone/voice/remove',
 						data: { 'id': voice},
 						success: function(data) {
 							if (data == 'success') {

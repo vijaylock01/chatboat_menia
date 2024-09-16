@@ -103,7 +103,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'post',
-				url: '/admin/finance/report/notification',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>admin/finance/report/notification',
 				data: formData,
 				processData: false,
 				contentType: false,
@@ -129,7 +129,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'post',
-				url: '/admin/finance/report/notification',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>admin/finance/report/notification',
 				data: formData,
 				processData: false,
 				contentType: false,

@@ -3728,7 +3728,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/templates/save',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/templates/save',
 			data: { 'id': event.target, 'text': textarea, 'workbook': workbook, 'language': language.value, 'title': title},
 			success: function (data) {					
 				if (data['status'] == 'success') {

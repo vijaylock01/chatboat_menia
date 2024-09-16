@@ -146,7 +146,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/user/purchases/invoice/upload',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>user/purchases/invoice/upload',
 							data: formData,
 							processData: false,
 							contentType: false,

@@ -241,6 +241,7 @@ class ChatController extends Controller
 	*/
     public function generateChat(Request $request) 
     {  
+       
         $conversation_id = $request->conversation_id;
 
         $message = session()->get('message'); 
@@ -1420,9 +1421,37 @@ class ChatController extends Controller
                     $model = 'Claude 3 Haiku';
                     $balance = (auth()->user()->claude_3_haiku_credits == -1) ? __('Unlimited') : \App\Services\HelperService::userAvailableClaudeHaikuWords();
                     break;
-                case 'gemini_pro':
-                    $model = 'Gemini Pro';
-                    $balance = (auth()->user()->gemini_pro_credits == -1) ? __('Unlimited') : \App\Services\HelperService::userAvailableGeminiProWords();
+                case 'phi-3-mini-4k-instruct':
+                    $model = 'Phi-3-mini-4k-instruct';
+                    $balance =  __('Unlimited');
+                    break;
+                case 'mistral-7b-instruct-v0.2':
+                    $model = 'Mistral-7b-instruct-v0.2';
+                    $balance = __('Unlimited');
+                    break;
+                case 'mixtral-8x7b-instruct-v0.1':
+                    $model = 'Mixtral-8x7b-instruct-v0.1';
+                    $balance = __('Unlimited');
+                    break;
+                case 'meta-llama-3-8b-instruct':
+                    $model = 'Meta-llama-3-8b-instruct';
+                    $balance = __('Unlimited');
+                    break;
+                case 'gemma-1.1-2b-it':
+                    $model = 'Gemma-1.1-2b-it';
+                    $balance = __('Unlimited');
+                    break;
+                case 'zephyr-7b-alpha':
+                    $model = 'Zephyr-7b-alpha';
+                    $balance = __('Unlimited');
+                    break;
+                case 'mistral-nemo-instruct-2407':
+                    $model = 'Mistral-nemo-instruct-2407';
+                    $balance = __('Unlimited');
+                    break;
+                case 'mistral-7b-instruct-v0.3':
+                    $model = 'Mistral-7b-instruct-v0.3';
+                    $balance = __('Unlimited');
                     break;
                 default:
                     $model = 'Fine Tune';

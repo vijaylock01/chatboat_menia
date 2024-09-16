@@ -370,7 +370,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/vision/conversation',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/vision/conversation',
 				data: { 'conversation_id': id, 'chat_code': chat_code},
 				success: function (data) {
 
@@ -452,7 +452,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/vision/conversation',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/vision/conversation',
 			data: { 'conversation_id': id, 'chat_code': chat_code},
 			success: function (data) {
 
@@ -501,7 +501,7 @@
 		$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/vision/history',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/vision/history',
 				data: { 'conversation_id': active_id,},
 				success: function (data) {
 
@@ -553,7 +553,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/vision/rename',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/vision/rename',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -595,7 +595,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/vision/delete',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/vision/delete',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -615,7 +615,7 @@
 								$.ajax({
 									headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 									method: 'POST',
-									url: '/user/vision/conversation',
+									url: '<?php echo env('BASE_URL_PUBLIC');?>user/vision/conversation',
 									data: { 'conversation_id': id, 'chat_code': chat_code},
 									success: function (data) {
 
@@ -1184,7 +1184,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/templates/brand',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/templates/brand',
 				data: { 'brand': input.value},
 				success: function (data) {					
 					if (data['status'] == 'success') {
@@ -1252,7 +1252,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/model',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/model',
 			data: { 'model': radio.value},
 			success: function (data) {					
 				let balance = document.getElementById('balance-number');

@@ -118,7 +118,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/admin/email/newsletter/delete',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>admin/email/newsletter/delete',
 							data: formData,
 							processData: false,
 							contentType: false,

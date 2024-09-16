@@ -100,7 +100,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'POST',
-					url: '/admin/email/newsletter/send',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>admin/email/newsletter/send',
 					data: form,
 					contentType: false,
 					processData: false,

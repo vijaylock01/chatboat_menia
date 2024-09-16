@@ -791,7 +791,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/user/purchases/subscriptions/cancel',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>user/purchases/subscriptions/cancel',
 							data: formData,
 							processData: false,
 							contentType: false,

@@ -366,7 +366,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/photo-studio/generate',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/photo-studio/generate',
 				data: form,
 				contentType: false,
 				processData: false,

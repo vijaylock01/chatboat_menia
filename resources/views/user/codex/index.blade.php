@@ -342,7 +342,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/code/save',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/code/save',
 				data: { 'id': event.target, 'text': textarea, 'title': title},
 				success: function (data) {					
 					if (data['status'] == 'success') {
@@ -377,7 +377,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/model',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/model',
 			data: { 'model': model},
 			success: function (data) {					
 				let balance = document.getElementById('balance-number');

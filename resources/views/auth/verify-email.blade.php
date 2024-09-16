@@ -82,7 +82,7 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},
 				type: "POST",
-				url: '/verify-email/confirm',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>verify-email/confirm',
 				data: {'verificationcode': code},
                 beforeSend: function() {
 					$('#verify').prop('disabled', true);

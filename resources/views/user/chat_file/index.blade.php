@@ -473,7 +473,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/file/conversation',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/conversation',
 			data: { 'chat_id': active_id,},
 			success: function (data) {
 
@@ -526,7 +526,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/chat/file/rename',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/rename',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -568,7 +568,7 @@
 				$.ajax({
 					headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 					method: 'post',
-					url: '/user/chat/file/delete',
+					url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/delete',
 					data: formData,
 					processData: false,
 					contentType: false,
@@ -1028,7 +1028,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/file/embedding',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/embedding',
 			data: formData,
 			processData: false,
 			contentType: false,
@@ -1076,7 +1076,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/file/check-balance',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/check-balance',
 			data: formData,
 			processData: false,
 			contentType: false,
@@ -1101,7 +1101,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/file/metainfo',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/metainfo',
 			data: formData,
 			processData: false,
 			contentType: false,
@@ -1163,7 +1163,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'post',
-			url: '/user/chat/file/credits',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/file/credits',
 			data: 'credit',
 			processData: false,
 			contentType: false,
@@ -1199,7 +1199,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '/user/templates/brand',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/templates/brand',
 				data: { 'brand': input.value},
 				success: function (data) {					
 					if (data['status'] == 'success') {
@@ -1266,7 +1266,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '/user/chat/model',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/model',
 			data: { 'model': radio.value},
 			success: function (data) {					
 				let balance = document.getElementById('balance-number');

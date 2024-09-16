@@ -104,7 +104,7 @@
 						$.ajax({
 							headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 							method: 'post',
-							url: '/admin/settings/activation/destroy',
+							url: '<?php echo env('BASE_URL_PUBLIC');?>admin/settings/activation/destroy',
 							data: formData,
 							processData: false,
 							contentType: false,
