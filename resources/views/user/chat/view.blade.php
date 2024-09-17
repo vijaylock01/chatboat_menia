@@ -320,7 +320,7 @@
 			$.ajax({
 				headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 				method: 'POST',
-				url: '<?php echo env('BASE_URL_PUBLIC');?>chatboat_menia/public/user/chat/conversation',
+				url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/conversation',
 				data: { 'conversation_id': id, 'chat_code': chat_code},
 				success: function (data) {
 
@@ -422,7 +422,7 @@
 		$.ajax({
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			method: 'POST',
-			url: '<?php echo env('BASE_URL_PUBLIC');?>chatboat_menia/public/user/chat/conversation',
+			url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/conversation',
 			data: { 'conversation_id': id, 'chat_code': chat_code},
 			success: function (data) {
 
@@ -578,7 +578,7 @@
 								$.ajax({
 									headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 									method: 'POST',
-									url: '<?php echo env('BASE_URL_PUBLIC');?>chatboat_menia/public/user/chat/conversation',
+									url: '<?php echo env('BASE_URL_PUBLIC');?>user/chat/conversation',
 									data: { 'conversation_id': id, 'chat_code': chat_code},
 									success: function (data) {
 
@@ -668,6 +668,7 @@
 		appendMessage(bot_avatar, "left", "", code);
         let $msg_txt = $("#" + code);
 		let $div = $("#chat-bubble-" + code);
+		let newChatId = 0;
 		fetch('<?php echo env('BASE_URL_PUBLIC');?>user/chat/process', {
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -686,10 +687,12 @@
 					Swal.fire('{{ __('Chat Notification') }}', result['message'], 'warning');
 					clearConversationInvalid();
 				}
+				else {
+					newChatId =  result['chat_id'];
+				}
 			})	
 			.then(data => {
-				
-				eventSource = new EventSource("<?php echo env('BASE_URL_PUBLIC');?>user/chat/generate?conversation_id=" + active_id);				
+				eventSource = new EventSource("<?php echo env('BASE_URL_PUBLIC');?>user/chat/generate?conversation_id=" + active_id+"&chat_id="+newChatId);				
 				const response = document.getElementById(code);
 				const chatbubble = document.getElementById('chat-bubble-' + code);
 				let msg = '';

@@ -342,310 +342,631 @@ class ChatController extends Controller
 
         return response()->stream(function () use($conversation_id, $googlePrompt, $prompt, $user_prompt) {
 
-            if (config('settings.personal_openai_api') == 'allow') {
-                $open_ai = new OpenAi(auth()->user()->personal_openai_key);        
-            } elseif (!is_null(auth()->user()->plan_id)) {
+            
+
+        //echo config('settings.personal_openai_api');die;
+        //echo auth()->user()->plan_id;
+        if (config('settings.personal_openai_api') == 'allow') {
+            $open_ai = new OpenAi(auth()->user()->personal_openai_key);        
+        } 
+        elseif (!is_null(auth()->user()->plan_id)) {
+            $validPlansDefault = ['phi-3-mini-4k-instruct','mistral-7b-instruct-v0.2','mixtral-8x7b-instruct-v0.1','gemma-1.1-2b-it','zephyr-7b-alpha','mistral-nemo-instruct-2407','mistral-7b-instruct-v0.3','meta-llama-3-8b-instruct'];
+            if (in_array(auth()->user()->plan_id, $validPlans)) {
+                
+            }
+            else {
                 $check_api = SubscriptionPlan::where('id', auth()->user()->plan_id)->first();
                 if ($check_api->personal_openai_api) {
                     $open_ai = new OpenAi(auth()->user()->personal_openai_key);               
-                } else {
+                } 
+                else {
                     if (config('settings.openai_key_usage') !== 'main') {
-                       $api_keys = ApiKey::where('engine', 'openai')->where('status', true)->pluck('api_key')->toArray();
-                       array_push($api_keys, config('services.openai.key'));
-                       $key = array_rand($api_keys, 1);
-                       $open_ai = new OpenAi($api_keys[$key]);
-                   } else {
-                       $open_ai = new OpenAi(config('services.openai.key'));
-                   }
-               }
-               
+                        $api_keys = ApiKey::where('engine', 'openai')->where('status', true)->pluck('api_key')->toArray();
+                        array_push($api_keys, config('services.openai.key'));
+                        $key = array_rand($api_keys, 1);
+                        $open_ai = new OpenAi($api_keys[$key]);
+                    } else {
+                        $open_ai = new OpenAi(config('services.openai.key'));
+                    }
+                }
+            }
+            
+        } 
+        else {
+            if (config('settings.openai_key_usage') !== 'main') {
+                $api_keys = ApiKey::where('engine', 'openai')->where('status', true)->pluck('api_key')->toArray();
+                array_push($api_keys, config('services.openai.key'));
+                $key = array_rand($api_keys, 1);
+                $open_ai = new OpenAi($api_keys[$key]);
             } else {
-                if (config('settings.openai_key_usage') !== 'main') {
-                    $api_keys = ApiKey::where('engine', 'openai')->where('status', true)->pluck('api_key')->toArray();
-                    array_push($api_keys, config('services.openai.key'));
-                    $key = array_rand($api_keys, 1);
-                    $open_ai = new OpenAi($api_keys[$key]);
-                } else {
-                    $open_ai = new OpenAi(config('services.openai.key'));
+                $open_ai = new OpenAi(config('services.openai.key'));
+            }
+        }
+        
+        if (!empty(session()->has('chat_id'))) {
+            $chat_id = session()->get('chat_id');
+        }
+        else {
+            $chat_id = $request->chat_id;
+        }
+        
+        $chat_conversation = ChatConversation::where('conversation_id', $conversation_id)->first();  
+        $chat_message = ChatHistory::where('id', $chat_id)->first();
+        $text = "";
+        $model = '';
+       
+        if (is_null($chat_message->images)) {
+            
+            $main_chat = Chat::where('chat_code', $chat_conversation->chat_code)->first();
+            $chat_messages = ChatHistory::where('conversation_id', $conversation_id)->orderBy('created_at', 'desc')->take(6)->get()->reverse();
+            $main_prompt = $main_chat->prompt . ' ' . $prompt;
+            $model = $chat_message->model;
+            //echo "<pre>";print_r($chat_messages); die;
+            if ($model == 'claude-3-opus-20240229' || $model == 'claude-3-5-sonnet-20240620' || $model == 'claude-3-haiku-20240307') {
+                $messages = [];
+
+                foreach ($chat_messages as $chat) {
+                    $messages[] = ['role' => 'user', 'content' => $chat['prompt']];
+                    if (!empty($chat['response'])) {
+                        $messages[] = ['role' => 'assistant', 'content' => $chat['response']];
+                    } else {
+                        $messages[] = ['role' => 'assistant', 'content' => 'Please repeat your question'];
+                    }
+                 
+                }
+
+            } 
+            else {
+                $messages[] = ['role' => 'user', 'content' => $main_prompt];
+                foreach ($chat_messages as $chat) {
+                    $messages[] = ['role' => 'user', 'content' => $chat['prompt']];
+                    if (!empty($chat['response'])) {
+                        $messages[] = ['role' => 'assistant', 'content' => $chat['response']];
+                    }
                 }
             }
-    
-            if (session()->has('chat_id')) {
-                $chat_id = session()->get('chat_id');
+
+            if ($googlePrompt != '') {
+                $messages[] = ['role' => 'user', 'content' => $googlePrompt];
             }
-
-            $chat_conversation = ChatConversation::where('conversation_id', $conversation_id)->first();  
-            $chat_message = ChatHistory::where('id', $chat_id)->first();
-            $text = "";
-            $model = '';
-
-            if (is_null($chat_message->images)) {
-                
-                $main_chat = Chat::where('chat_code', $chat_conversation->chat_code)->first();
-                $chat_messages = ChatHistory::where('conversation_id', $conversation_id)->orderBy('created_at', 'desc')->take(6)->get()->reverse();
-                $main_prompt = $main_chat->prompt . ' ' . $prompt;
-                $model = $chat_message->model;
-
-                if ($model == 'claude-3-opus-20240229' || $model == 'claude-3-5-sonnet-20240620' || $model == 'claude-3-haiku-20240307') {
-                    $messages = [];
-
-                    foreach ($chat_messages as $chat) {
-                        $messages[] = ['role' => 'user', 'content' => $chat['prompt']];
-                        if (!empty($chat['response'])) {
-                            $messages[] = ['role' => 'assistant', 'content' => $chat['response']];
-                        } else {
-                            $messages[] = ['role' => 'assistant', 'content' => 'Please repeat your question'];
-                        }
-                     
-                    }
-
+            //echo "<pre>"; print_r($messages); die;
+            if ($model == 'claude-3-opus-20240229' || $model == 'claude-3-5-sonnet-20240620' || $model == 'claude-3-haiku-20240307') {
+                # Check Claude API key
+                if (config('settings.personal_claude_api') == 'allow') {
+                    $claude_api = auth()->user()->personal_claude_key;        
+                } elseif (!is_null(auth()->user()->plan_id)) {
+                    $check_api = SubscriptionPlan::where('id', auth()->user()->plan_id)->first();
+                    if ($check_api->personal_claude_api) {
+                        $claude_api = auth()->user()->personal_claude_key;               
+                    } else {
+                        $claude_api = config('anthropic.api_key');                           
+                   }                       
                 } else {
-                    $messages[] = ['role' => 'system', 'content' => $main_prompt];
-
-                    foreach ($chat_messages as $chat) {
-                        $messages[] = ['role' => 'user', 'content' => $chat['prompt']];
-                        if (!empty($chat['response'])) {
-                            $messages[] = ['role' => 'assistant', 'content' => $chat['response']];
-                        }
-                    }
+                    $claude_api = config('anthropic.api_key'); 
                 }
 
-                if ($googlePrompt != '') {
-                    $messages[] = ['role' => 'user', 'content' => $googlePrompt];
-                }
+                $anthropic = new \WpAi\Anthropic\AnthropicAPI($claude_api);
 
+                try {
+                    $response = $anthropic->messages()
+                                ->model($model)
+                                ->maxTokens(4096)
+                                ->system($main_prompt)
+                                ->messages($messages)
+                                ->temperature(1.0)
+                                ->stream();
 
-                if ($model == 'claude-3-opus-20240229' || $model == 'claude-3-5-sonnet-20240620' || $model == 'claude-3-haiku-20240307') {
+                    foreach ($response as $result) {
+                        if ($result['type'] == 'content_block_delta') {
+                            $raw = $result['delta']['text'];
 
-                    # Check Claude API key
-                    if (config('settings.personal_claude_api') == 'allow') {
-                        $claude_api = auth()->user()->personal_claude_key;        
-                    } elseif (!is_null(auth()->user()->plan_id)) {
-                        $check_api = SubscriptionPlan::where('id', auth()->user()->plan_id)->first();
-                        if ($check_api->personal_claude_api) {
-                            $claude_api = auth()->user()->personal_claude_key;               
-                        } else {
-                            $claude_api = config('anthropic.api_key');                           
-                       }                       
-                    } else {
-                        $claude_api = config('anthropic.api_key'); 
-                    }
+                        // $clean = str_replace(["\r\n", "\r", "\n"], "<br/>", $raw);
+                            $text .= $raw;
 
-                    $anthropic = new \WpAi\Anthropic\AnthropicAPI($claude_api);
-
-                    try {
-                        $response = $anthropic->messages()
-                                    ->model($model)
-                                    ->maxTokens(4096)
-                                    ->system($main_prompt)
-                                    ->messages($messages)
-                                    ->temperature(1.0)
-                                    ->stream();
-
-                        foreach ($response as $result) {
-                            if ($result['type'] == 'content_block_delta') {
-                                $raw = $result['delta']['text'];
-
-                            // $clean = str_replace(["\r\n", "\r", "\n"], "<br/>", $raw);
-                                $text .= $raw;
-
-                                echo 'data: ' . $raw ."\n\n";
-                                ob_flush();
-                                flush();
-                                usleep(400);
-                            }
-                            
-                            if (connection_aborted()) { break; }
-                            
-                        }
-                    } catch (\Exception $exception) {
-                        echo "data: " . $exception->getMessage();
-                        echo "\n\n";
-                        ob_flush();
-                        flush();
-                        echo 'data: [DONE]';
-                        echo "\n\n";
-                        ob_flush();
-                        flush();
-                        usleep(50000);
-                    }
-                    
-
-                } elseif ($model == 'gemini_pro') {
-
-                    # Check Gemini API key
-                    if (config('settings.personal_gemini_api') == 'allow') {
-                        $gemini_api = auth()->user()->personal_gemini_key;        
-                    } elseif (!is_null(auth()->user()->plan_id)) {
-                        $check_api = SubscriptionPlan::where('id', auth()->user()->plan_id)->first();
-                        if ($check_api->personal_gemini_api) {
-                            $gemini_api = auth()->user()->personal_gemini_key;               
-                        } else {
-                            $gemini_api = config('gemini.api_key');                           
-                       }                       
-                    } else {
-                        $gemini_api = config('gemini.api_key'); 
-                    }
-
-                    $gemini_client = \Gemini::factory()
-                        ->withApiKey($gemini_api)
-                        ->withHttpClient($client = new GuzzleClient())
-                        ->withStreamHandler(fn (RequestInterface $request): ResponseInterface => $client->send($request, ['stream' => true]))
-                      ->make();
-
-                    try {
-                        $prompt = $main_prompt . ' Based on previous information about your role, answer this users question: ' . $user_prompt; 
-                        //$clean = Markdown::defaultTransform($response->text());
-                        $stream = $gemini_client->geminiPro()->streamGenerateContent($prompt);
-
-                        foreach ($stream as $response) {
-                           $clean = str_replace(["\r\n", "\r", "\n"], "<br/>", $response->text());
-                           $text .= $response->text();
-                           echo 'data: ' . $clean ."\n\n";
-                           ob_flush();
-                           flush();
-                        }
-
-                    } catch (\Exception $exception) {
-                        echo "data: " . $exception->getMessage();
-                        echo "\n\n";
-                        ob_flush();
-                        flush();
-                        echo 'data: [DONE]';
-                        echo "\n\n";
-                        ob_flush();
-                        flush();
-                        usleep(50000);
-                    }
-   
-                } else {
-
-                    $opts = [
-                        'model' => $model,
-                        'messages' => $messages,
-                        'temperature' => 1.0,
-                        'frequency_penalty' => 0,
-                        'presence_penalty' => 0,
-                        'stream' => true
-                    ];                
-
-                    try {
-
-                        $complete = $open_ai->chat($opts, function ($curl_info, $data) use (&$text) {
-                            if ($obj = json_decode($data) and $obj->error->message != "") {
-                                \Log::info(json_encode($obj->error->message));
-                                echo "data: " . $obj->error->message;
-                                echo "\n\n";
-                                ob_flush();
-                                flush();
-                                echo 'data: [DONE]';
-                                echo "\n\n";
-                                ob_flush();
-                                flush();
-                                usleep(50000);
-                            } else {
-                                echo $data;
-        
-                                $array = explode('data: ', $data);
-                                foreach ($array as $response){
-                                    $response = json_decode($response, true);
-
-                                    if ($data != "data: [DONE]\n\n" and isset($response["choices"][0]["delta"]["content"])) {
-                                        $text .= $response["choices"][0]["delta"]["content"];
-                                    }
-                                }
-                            }
-        
-                            echo PHP_EOL;
+                            echo 'data: ' . $raw ."\n\n";
                             ob_flush();
                             flush();
-                            return strlen($data);
-                        });
-
-                    } catch (\Exception $exception) {
-                        echo "data: " . $exception->getMessage();
-                        echo "\n\n";
-                        ob_flush();
-                        flush();
-                        echo 'data: [DONE]';
-                        echo "\n\n";
-                        ob_flush();
-                        flush();
-                        usleep(50000);
-                    }
-                }
-                
-
-            } else {
-                $guzzle_client = new GuzzleClient();
-                $url = 'https://api.openai.com/v1/chat/completions';
-                $model = 'gpt-4-turbo-2024-04-09';
-                $response = $guzzle_client->post($url,
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . config('services.openai.key'),
-                    ],
-                    'json' => [
-                        'model' => $model,
-                        'messages' => [
-                            [
-                            'role' => 'user',
-                            'content' => [
-                                        [
-                                            'type' => 'text',
-                                            'text' => $chat_message->prompt,
-                                        ],
-                                        [
-                                        'type' => 'image_url',
-                                        'image_url' => [
-                                            'url' => $chat_message->images,
-                                            ],
-                                        ],
-                                ],
-                            ],
-                        ],
-                        'max_tokens' => 2500,
-                        'stream' => true,
-                        
-                    ]
-                ]);     
-
-                foreach (explode("\n", $response->getBody()->getContents()) as $data) { 
-                    if ($data != 'data: [DONE]') {
-                        $array = explode('data: ', $data);
-                    } else {
-                        echo "data: [DONE]";
-                    }
-                    
-                    foreach ($array as $response){
-                        $response = json_decode($response, true);
-                        if ($data != "data: [DONE]\n\n" and isset($response["choices"][0]["delta"]["content"])) {
-                            $text .= $response["choices"][0]["delta"]["content"];
-                            $raw = $response['choices'][0]['delta']['content'];
-                            $clean = str_replace(["\r\n", "\r", "\n"], "<br/>", $raw);
-                            echo "data: " . $clean;
+                            usleep(400);
                         }
+                        
+                        if (connection_aborted()) { break; }
+                        
                     }
-                
-                    echo PHP_EOL;
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
                     ob_flush();
                     flush();
-                    
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+                
+
+            } 
+            elseif ($model == 'gemini_pro') {
+                # Check Gemini API key
+                if (config('settings.personal_gemini_api') == 'allow') {
+                    $gemini_api = auth()->user()->personal_gemini_key;        
+                } elseif (!is_null(auth()->user()->plan_id)) {
+                    $check_api = SubscriptionPlan::where('id', auth()->user()->plan_id)->first();
+                    if ($check_api->personal_gemini_api) {
+                        $gemini_api = auth()->user()->personal_gemini_key;               
+                    } else {
+                        $gemini_api = config('gemini.api_key');                           
+                   }                       
+                } else {
+                    $gemini_api = config('gemini.api_key'); 
+                }
+
+                $gemini_client = \Gemini::factory()
+                    ->withApiKey($gemini_api)
+                    ->withHttpClient($client = new GuzzleClient())
+                    ->withStreamHandler(fn (RequestInterface $request): ResponseInterface => $client->send($request, ['stream' => true]))
+                  ->make();
+
+                try {
+                    $prompt = $main_prompt . ' Based on previous information about your role, answer this users question: ' . $user_prompt; 
+                    //$clean = Markdown::defaultTransform($response->text());
+                    $stream = $gemini_client->geminiPro()->streamGenerateContent($prompt);
+
+                    foreach ($stream as $response) {
+                       $clean = str_replace(["\r\n", "\r", "\n"], "<br/>", $response->text());
+                       $text .= $response->text();
+                       echo 'data: ' . $clean ."\n\n";
+                       ob_flush();
+                       flush();
+                    }
+
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+
+            } 
+            elseif($model == 'phi-3-mini-4k-instruct') {
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct/v1/chat/completions');
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'microsoft/Phi-3-mini-4k-instruct',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    $response['choices'][0]['message']['content'];
+                    curl_close($ch);
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+                
+            }
+            elseif($model == 'mistral-7b-instruct-v0.2'){
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2/v1/chat/completions');
+
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    curl_close($ch); 
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
                 }
             }
+            elseif($model == 'mixtral-8x7b-instruct-v0.1'){
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions');
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    // Close the cURL session
+                    curl_close($ch);
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+            elseif($model == 'gemma-1.1-2b-it'){
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/google/gemma-1.1-2b-it/v1/chat/completions');
 
-            # Update credit balance
-            $words = count(explode(' ', ($text)));
-            HelperService::updateBalance($words, $model);  
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'google/gemma-1.1-2b-it',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    curl_close($ch);
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+            elseif($model == 'zephyr-7b-alpha'){
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-alpha/v1/chat/completions');
 
-            $current_chat = ChatHistory::where('id', $chat_id)->first();
-            $current_chat->response = $text;
-            $current_chat->words = $words;
-            $current_chat->save();
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    curl_close($ch);
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+            elseif($model == 'mistral-nemo-instruct-2407'){
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/mistralai/Mistral-Nemo-Instruct-2407/v1/chat/completions');
+                    
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    curl_close($ch);    
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+            elseif($model == 'mistral-7b-instruct-v0.3'){
+                try {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions');
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Authorization: Bearer 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',
+                        'Content-Type: application/json'
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                        'model' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+                        'messages' => $messages,
+                        'max_tokens' => 500,
+                        'stream' => false
+                    ]));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    $response = curl_exec($ch);
+                    $response=json_decode($response,true);
+                    curl_close($ch);
+                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+            elseif($model == 'meta-llama-3-8b-instruct'){
+                try {
+                    $ch = curl_init();
 
-            $chat_conversation->words = ++$words;
-            $chat_conversation->messages = $chat_conversation->messages + 1;
-            $chat_conversation->save();
+                        // Set the URL of the API endpoint
+                        curl_setopt($ch, CURLOPT_URL, 'https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions');
+
+                        // Set the HTTP request headers
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                            'Authorization: Bearer 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',
+                            'Content-Type: application/json'
+                        ]);
+
+                        // Set the request method to POST
+                        curl_setopt($ch, CURLOPT_POST, 1);
+
+                        // Set the POST fields
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                            'model' => 'meta-llama/Meta-Llama-3-8B-Instruct',
+                            'messages' => $messages,
+                            'max_tokens' => 500,
+                            'stream' => false
+                        ]));
+
+                        // Set option to return the response as a string
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+                        // Execute the request
+                        $response = curl_exec($ch);
+
+
+                        $response=json_decode($response,true);
+                        curl_close($ch);
+                        echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                        ob_flush();
+                        flush();
+                        usleep(400);
+                
+                } catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+            else {
+                $opts = [
+                    'model' => $model,
+                    'messages' => $messages,
+                    'temperature' => 1.0,
+                    'frequency_penalty' => 0,
+                    'presence_penalty' => 0,
+                    'stream' => true
+                ];                
+
+                try {
+                    $complete = $open_ai->chat($opts, function ($curl_info, $data) use (&$text) {
+                        if ($obj = json_decode($data) and $obj->error->message != "") {
+                            \Log::info(json_encode($obj->error->message));
+                            echo "data: " . $obj->error->message;
+                            echo "\n\n";
+                            ob_flush();
+                            flush();
+                            echo 'data: [DONE]';
+                            echo "\n\n";
+                            ob_flush();
+                            flush();
+                            usleep(50000);
+                        } else {
+                            echo $data;
+    
+                            $array = explode('data: ', $data);
+                            foreach ($array as $response){
+                                $response = json_decode($response, true);
+
+                                if ($data != "data: [DONE]\n\n" and isset($response["choices"][0]["delta"]["content"])) {
+                                    $text .= $response["choices"][0]["delta"]["content"];
+                                }
+                            }
+                        }
+    
+                        echo PHP_EOL;
+                        ob_flush();
+                        flush();
+                        return strlen($data);
+                    });
+
+                } 
+                catch (\Exception $exception) {
+                    echo "data: " . $exception->getMessage();
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    echo 'data: [DONE]';
+                    echo "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
+                }
+            }
+        } 
+        else {
+            $guzzle_client = new GuzzleClient();
+            $url = 'https://api.openai.com/v1/chat/completions';
+            $model = 'gpt-4-turbo-2024-04-09';
+            $response = $guzzle_client->post($url,
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . config('services.openai.key'),
+                ],
+                'json' => [
+                    'model' => $model,
+                    'messages' => [
+                        [
+                        'role' => 'user',
+                        'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => $chat_message->prompt,
+                                    ],
+                                    [
+                                    'type' => 'image_url',
+                                    'image_url' => [
+                                        'url' => $chat_message->images,
+                                        ],
+                                    ],
+                            ],
+                        ],
+                    ],
+                    'max_tokens' => 2500,
+                    'stream' => true,
+                    
+                ]
+            ]);     
+
+            foreach (explode("\n", $response->getBody()->getContents()) as $data) { 
+                if ($data != 'data: [DONE]') {
+                    $array = explode('data: ', $data);
+                } else {
+                    echo "data: [DONE]";
+                }
+                
+                foreach ($array as $response){
+                    $response = json_decode($response, true);
+                    if ($data != "data: [DONE]\n\n" and isset($response["choices"][0]["delta"]["content"])) {
+                        $text .= $response["choices"][0]["delta"]["content"];
+                        $raw = $response['choices'][0]['delta']['content'];
+                        $clean = str_replace(["\r\n", "\r", "\n"], "<br/>", $raw);
+                        echo "data: " . $clean;
+                    }
+                }
+            
+                echo PHP_EOL;
+                ob_flush();
+                flush();
+                
+            }
+        }
+
+        # Update credit balance
+        $words = count(explode(' ', ($text)));
+        HelperService::updateBalance($words, $model);  
+
+        $current_chat = ChatHistory::where('id', $chat_id)->first();
+        $current_chat->response = $text;
+        $current_chat->words = $words;
+        $current_chat->save();
+
+        $chat_conversation->words = ++$words;
+        $chat_conversation->messages = $chat_conversation->messages + 1;
+        $chat_conversation->save();
 
         }, 200, [
             'Cache-Control' => 'no-cache',
