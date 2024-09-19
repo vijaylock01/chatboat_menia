@@ -417,7 +417,7 @@ class ChatController extends Controller
 
             } 
             else {
-                $messages[] = ['role' => 'user', 'content' => $main_prompt];
+                $messages[] = ['role' => 'system', 'content' => $main_prompt];
                 foreach ($chat_messages as $chat) {
                     $messages[] = ['role' => 'user', 'content' => $chat['prompt']];
                     if (!empty($chat['response'])) {
@@ -550,20 +550,21 @@ class ChatController extends Controller
                     ]));
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                     $response = curl_exec($ch);
-                    $response=json_decode($response,true);
-                    $response['choices'][0]['message']['content'];
+                    $response = json_decode($response, true);
                     curl_close($ch);
-                    echo 'data: ' . $response['choices'][0]['message']['content'] ."\n\n";
+                    $text = $response['choices'][0]['message']['content'];
+                    echo 'data: ' . $response['choices'][0]['message']['content'] . "\n\n";
                     ob_flush();
                     flush();
-                    usleep(400);
+                    echo 'data: [DONE]' . "\n\n";
+                    ob_flush();
+                    flush();
+                    usleep(50000);
                 } catch (\Exception $exception) {
-                    echo "data: " . $exception->getMessage();
-                    echo "\n\n";
+                    echo "data: " . $exception->getMessage() . "\n\n";
                     ob_flush();
                     flush();
-                    echo 'data: [DONE]';
-                    echo "\n\n";
+                    echo 'data: [DONE]' . "\n\n";
                     ob_flush();
                     flush();
                     usleep(50000);
